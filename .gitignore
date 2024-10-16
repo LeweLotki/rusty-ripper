@@ -1,0 +1,16 @@
+# Ignore Cargo's output files
+/target/
+
+# If you're using an IDE, ignore its files
+**/*.rs.bk
+.idea/
+.vscode/
+
+# Ignore any backups or temporary files
+*.bak
+*.tmp
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
