@@ -1,3 +1,6 @@
+pub mod cli;
+use cli::parser::CLI;
+
 fn main() {
-    println!("Hello, world!");
+    CLI::run_parser();
 }
