@@ -4,6 +4,7 @@ use std::io::{self, Read};
 pub struct Dictionary {
     pub path: String,
     pub content: String,
+    pub tokens: Vec<String>,
 }
 
 impl Dictionary {
@@ -11,6 +12,7 @@ impl Dictionary {
         Dictionary {
             path,
             content: String::new(),
+            tokens: Vec::new(),
         }
     }
 
@@ -22,8 +24,19 @@ impl Dictionary {
         Ok(())
     }
 
-    pub fn display_content(&self) {
-        println!("File content:\n{}", self.content);
+    pub fn validate(&self) -> bool {
+        self.content.lines().all(|line| line.split_whitespace().count() == 1)
+    }
+
+    pub fn parse_tokens(&mut self) {
+        self.tokens = self.content.lines().map(|line| line.to_string()).collect();
+    }
+
+    pub fn display_tokens(&self) {
+        println!("Tokens in dictionary:");
+        for token in &self.tokens {
+            println!("{}", token);
+        }
     }
 }
 
@@ -31,7 +44,12 @@ pub fn display(path: &String) {
     let mut dictionary = Dictionary::new(path.clone());
 
     if dictionary.load_content().is_ok() {
-        dictionary.display_content();
+        if dictionary.validate() {
+            dictionary.parse_tokens();  
+            dictionary.display_tokens();
+        } else {
+            println!("The file is not a valid dictionary.");
+        }
     } else {
         println!("Failed to load file: {}", path);
     }
