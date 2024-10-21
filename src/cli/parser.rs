@@ -1,9 +1,12 @@
 use clap::Parser;
+use crate::modes::greet;
 
 #[derive(Parser)]
 pub struct CLI {
+
     #[arg(long)]
-    pub name: String,
+    pub name: Option<String>,
+    
     #[arg(short, long)]
     pub loud: bool
 }
@@ -11,11 +14,8 @@ pub struct CLI {
 impl CLI {
     pub fn run_parser() -> () {
         let args = Self::parse();
-
-        if args.loud {
-            println!("HELLO {}", args.name.to_uppercase());
-        } else {
-            println!("Hello {}", args.name);
+        if let Some(ref name) = args.name {
+            greet::greet(&name, args.loud);
         }
     }
 }
