@@ -40,18 +40,19 @@ impl Dictionary {
     }
 }
 
-pub fn display(path: &String) {
-    let mut dictionary = Dictionary::new(path.clone());
-
+pub fn load(dictionary: &mut Dictionary) {
     if dictionary.load_content().is_ok() {
         if dictionary.validate() {
             dictionary.parse_tokens();  
-            dictionary.display_tokens();
         } else {
             println!("The file is not a valid dictionary.");
         }
     } else {
-        println!("Failed to load file: {}", path);
+        println!("Failed to load file: {}", dictionary.path);
     }
+}
+
+pub fn display(dictionary: &mut Dictionary) {
+    dictionary.display_tokens();
 }
 
