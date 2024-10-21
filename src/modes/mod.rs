@@ -1,5 +1,5 @@
 pub mod dictionary;
-pub mod hashes;
+pub mod hasher;
 
 pub trait ContentManager {
     fn load(&mut self) -> ();

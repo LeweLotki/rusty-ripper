@@ -10,8 +10,8 @@ pub struct Dictionary {
 }
 
 impl Dictionary {
-    pub fn new(path: String) -> Dictionary {
-        Dictionary {
+    pub fn new(path: String) -> Self {
+         Self {
             path,
             content: String::new(),
             tokens: Vec::new(),

@@ -1,5 +1,7 @@
 use clap::Parser;
-use crate::modes::{dictionary, hashes, ContentManager};
+use crate::modes::ContentManager;
+use crate::modes::dictionary::Dictionary;
+use crate::modes::hasher::Hasher;
 
 #[derive(Parser)]
 pub struct CLI {
@@ -20,15 +22,17 @@ impl CLI {
         }
 
         if let Some(ref dictionary_path) = args.dictionary {
-            let mut dictionary = dictionary::Dictionary::new(dictionary_path.clone());
+            let mut dictionary: Dictionary = Dictionary::new(dictionary_path.clone());
             dictionary.load();
 
             if args.hash.is_none() {
                 dictionary.display();
-            }
-
-            if let Some(ref hash_function) = args.hash {
-                hashes::display(&dictionary, hash_function);
+            } else {
+                if let Some(ref hash_function) = args.hash {
+                    let mut hasher: Hasher = Hasher::new(dictionary, hash_function.to_string());
+                    hasher.load();
+                    hasher.display();
+                }
             }
         }
     }
