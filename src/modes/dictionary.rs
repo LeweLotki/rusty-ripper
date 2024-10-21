@@ -1,6 +1,8 @@
 use std::fs;
 use std::io::{self, Read};
 
+use crate::modes::ContentManager;
+
 pub struct Dictionary {
     pub path: String,
     pub content: String,
@@ -40,19 +42,21 @@ impl Dictionary {
     }
 }
 
-pub fn load(dictionary: &mut Dictionary) {
-    if dictionary.load_content().is_ok() {
-        if dictionary.validate() {
-            dictionary.parse_tokens();  
+impl ContentManager for Dictionary {
+    fn load(&mut self) -> () {
+        if self.load_content().is_ok() {
+            if self.validate() {
+                self.parse_tokens();  
+            } else {
+                println!("The file is not a valid dictionary.");
+            }
         } else {
-            println!("The file is not a valid dictionary.");
+            println!("Failed to load file: {}", self.path);
         }
-    } else {
-        println!("Failed to load file: {}", dictionary.path);
+           
+    }
+
+    fn display(&self) -> () {
+        self.display_tokens();
     }
 }
-
-pub fn display(dictionary: &mut Dictionary) {
-    dictionary.display_tokens();
-}
-
