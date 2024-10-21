@@ -58,7 +58,7 @@ impl Hasher {
 
     pub fn display_hashes(&self) {
         for (token, hash) in self.tokens.iter().zip(self.hashes.iter()) {
-            println!("{} -> {}", token, hash);
+            println!("{} => {}", token, hash);
         }
     }
 }
