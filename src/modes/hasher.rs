@@ -1,4 +1,5 @@
-use sha2::{Sha256, Digest}; 
+use sha2::{Sha256, Sha512, Digest};
+use md5::Md5;
 use hex;
 
 use crate::modes::dictionary::Dictionary;
@@ -22,20 +23,37 @@ impl Hasher {
     }
 
     pub fn load_hashes(&mut self) -> () {
+        let tokens: Vec<String> = self.dictionary.tokens.iter().cloned().collect();
         match self.hash_function.as_str() {
             "sha256" => {
-                for token in &self.dictionary.tokens {
-                    let mut hasher = Sha256::new();
-                    hasher.update(token.as_bytes());
-                    let result = hasher.finalize();
-                    self.tokens.push(token.clone());
-                    self.hashes.push(hex::encode(result));
+                for token in tokens {
+                    let hasher = Sha256::new();
+                    self.add_hash(token.to_string(), hasher);
+                }
+            }
+            "sha512" => {
+                for token in tokens {
+                    let hasher = Sha512::new();
+                    self.add_hash(token.to_string(), hasher);
+                }
+            }
+            "md5" => {
+                for token in tokens {
+                    let hasher = Md5::new();
+                    self.add_hash(token.to_string(), hasher);
                 }
             }
             _ => {
                 println!("Unsupported hash function: {}", self.hash_function);
             }
         }
+    }
+
+    fn add_hash<H: Digest>(&mut self, token: String, mut hasher: H) {
+        hasher.update(token.as_bytes());
+        let result = hasher.finalize();
+        self.tokens.push(token.clone());
+        self.hashes.push(hex::encode(result));
     }
 
     pub fn display_hashes(&self) {
