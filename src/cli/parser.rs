@@ -2,6 +2,7 @@ use clap::Parser;
 use crate::modes::ContentManager;
 use crate::modes::dictionary::Dictionary;
 use crate::modes::hasher::Hasher;
+use crate::modes::passwords::Passwords;
 
 #[derive(Parser)]
 pub struct CLI {
@@ -10,6 +11,9 @@ pub struct CLI {
 
     #[arg(long)]
     pub hash: Option<String>,
+
+    #[arg(short, long)]
+    pub passwords: Option<String>,
 }
 
 impl CLI {
@@ -19,6 +23,12 @@ impl CLI {
         if args.hash.is_some() && args.dictionary.is_none() {
             println!("Warning: Please provide a dictionary file using --dictionary.");
             return;
+        }
+
+        if let Some(ref passwords_path) = args.passwords {
+            let mut passwords: Passwords = Passwords::new(passwords_path.clone());
+            passwords.load();
+            passwords.display();
         }
 
         if let Some(ref dictionary_path) = args.dictionary {
