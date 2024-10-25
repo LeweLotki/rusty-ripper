@@ -3,6 +3,7 @@ use crate::modes::ContentManager;
 use crate::modes::dictionary::Dictionary;
 use crate::modes::hasher::Hasher;
 use crate::modes::passwords::Passwords;
+use crate::modes::retriver::Retriver;
 
 #[derive(Parser)]
 pub struct CLI {
@@ -25,25 +26,32 @@ impl CLI {
             return;
         }
 
+        let mut passwords: Option<Passwords> = None;
         if let Some(ref passwords_path) = args.passwords {
-            let mut passwords: Passwords = Passwords::new(passwords_path.clone());
-            passwords.load();
-            passwords.display();
+            let mut loaded_passwords = Passwords::new(passwords_path.clone());
+            loaded_passwords.load();
+            loaded_passwords.display();
+            passwords = Some(loaded_passwords);
         }
 
+        let mut hasher: Option<Hasher> = None;
         if let Some(ref dictionary_path) = args.dictionary {
-            let mut dictionary: Dictionary = Dictionary::new(dictionary_path.clone());
+            let mut dictionary = Dictionary::new(dictionary_path.clone());
             dictionary.load();
 
             if args.hash.is_none() {
                 dictionary.display();
-            } else {
-                if let Some(ref hash_function) = args.hash {
-                    let mut hasher: Hasher = Hasher::new(dictionary, hash_function.to_string());
-                    hasher.load();
-                    hasher.display();
-                }
+            } else if let Some(ref hash_function) = args.hash {
+                let mut created_hasher = Hasher::new(dictionary, hash_function.to_string());
+                created_hasher.load();
+                created_hasher.display();
+                hasher = Some(created_hasher);
             }
+        }
+
+        if let (Some(hasher), Some(passwords)) = (hasher, passwords) {
+            let retriver = Retriver::new(hasher, passwords);
+            retriver.run();
         }
     }
 }
