@@ -55,8 +55,11 @@ impl ContentManager for Dictionary {
         }
            
     }
-
     fn display(&self) -> () {
-        self.display_tokens();
+        if self.tokens.is_empty() {
+            println!("The dictionary could not be loaded due to wrong formatting.");
+        } else {
+            println!("Dictionary loaded successfully with {} tokens.", self.tokens.len());
+        }
     }
 }
