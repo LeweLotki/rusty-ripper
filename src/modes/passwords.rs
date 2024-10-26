@@ -50,10 +50,8 @@ impl Passwords {
 impl ContentManager for Passwords {
     fn load(&mut self) {
         if self.load_content().is_ok() {
-            if self.validate() {
-                println!("Passwords loaded successfully.");
-            } else {
-                println!("Error: The number of logins and passwords do not match.");
+            if !self.validate() {
+                 println!("Error: The number of logins and passwords do not match.");
             }
         } else {
             println!("Failed to load the file.");
@@ -61,7 +59,11 @@ impl ContentManager for Passwords {
     }
 
     fn display(&self) {
-        self.display_tokens();
+        if self.passwords.is_empty() {
+            println!("The CSV file could not be loaded due to wrong formatting.");
+        } else {
+            println!("Password-login pairs loaded successfully with {} pairs.", self.passwords.len());
+        }
     }
 }
 
