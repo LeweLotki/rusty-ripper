@@ -23,7 +23,7 @@ impl Retriver {
             for (j, password) in self.passwords.iter().enumerate() {
                 if hash == password {
                     if let (Some(login), Some(token)) = (self.logins.get(j), self.tokens.get(i)) {
-                        println!("Login: {}, Token: {}", login, token);
+                        println!("Login: {}, Password: {}", login, token);
                     }
                 }
             }

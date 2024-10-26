@@ -69,6 +69,23 @@ impl ContentManager for Hasher {
     }
 
     fn display(&self) -> () {
-        self.display_hashes();
+        match self.hash_function.as_str() {
+            "sha256" => {
+                println!("Hash Function: SHA-256");
+                println!("Description: SHA-256 is part of the SHA-2 family and produces a 256-bit hash value.");
+            }
+            "sha512" => {
+                println!("Hash Function: SHA-512");
+                println!("Description: SHA-512 is part of the SHA-2 family and produces a 512-bit hash value.");
+            }
+            "md5" => {
+                println!("Hash Function: MD5");
+                println!("Description: MD5 is an older hashing algorithm that produces a 128-bit hash value.");
+                println!("Note: MD5 is considered cryptographically broken and unsuitable for further use.");
+            }
+            _ => {
+                println!("Unsupported hash function: {}", self.hash_function);
+            }
+        }
     }
 }
