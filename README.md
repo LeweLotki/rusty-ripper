@@ -20,7 +20,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Clone the repository and build the project:
 
 ```bash
-git clone https://github.com/yourusername/rusty-ripper.git
+git clone https://github.com/LeweLotki/rusty-ripper.git
 cd rusty-ripper
 cargo build --release
 ```
