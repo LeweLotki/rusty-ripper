@@ -1,6 +1,8 @@
 use crate::modes::hasher::Hasher;
 use crate::modes::passwords::Passwords;
-use radix_trie::Trie; 
+
+use std::collections::HashMap;
+use rayon::prelude::*; 
 
 pub struct Retriver {
     pub tokens: Vec<String>,    // Tokens used to create hashes
@@ -20,16 +22,13 @@ impl Retriver {
     }
 
     pub fn run(&self) {
-        let mut hash_trie: Trie<String, String> = Trie::new();
-        for (hash, token) in self.hashes.iter().zip(self.tokens.iter()) {
-            hash_trie.insert(hash.clone(), token.clone());
-        }
+        let hash_map: HashMap<&String, &String> = self.hashes.par_iter().zip(self.tokens.par_iter()).collect();
 
-        for (login, password_hash) in self.logins.iter().zip(self.passwords.iter()) {
-            if let Some(token) = hash_trie.get(password_hash) {
+        self.logins.par_iter().zip(self.passwords.par_iter()).for_each(|(login, password_hash)| {
+            if let Some(token) = hash_map.get(password_hash) {
                 println!("Login: {}, Password: {}", login, token);
             }
-        }
+        });
     }
 }
 
