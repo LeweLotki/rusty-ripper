@@ -1,11 +1,12 @@
 use crate::modes::hasher::Hasher;
 use crate::modes::passwords::Passwords;
+use radix_trie::Trie; 
 
 pub struct Retriver {
-    pub tokens: Vec<String>, // token used to create a hash    
-    pub hashes: Vec<String>, // hash created from particular token
-    pub logins: Vec<String>, // login of user from csv file
-    pub passwords: Vec<String>, // hashed password for given login
+    pub tokens: Vec<String>,    // Tokens used to create hashes
+    pub hashes: Vec<String>,    // Hashes created from tokens
+    pub logins: Vec<String>,    // Logins from CSV file
+    pub passwords: Vec<String>, // Hashed passwords for given logins
 }
 
 impl Retriver {
@@ -19,13 +20,14 @@ impl Retriver {
     }
 
     pub fn run(&self) {
-        for (i, hash) in self.hashes.iter().enumerate() {
-            for (j, password) in self.passwords.iter().enumerate() {
-                if hash == password {
-                    if let (Some(login), Some(token)) = (self.logins.get(j), self.tokens.get(i)) {
-                        println!("Login: {}, Password: {}", login, token);
-                    }
-                }
+        let mut hash_trie: Trie<String, String> = Trie::new();
+        for (hash, token) in self.hashes.iter().zip(self.tokens.iter()) {
+            hash_trie.insert(hash.clone(), token.clone());
+        }
+
+        for (login, password_hash) in self.logins.iter().zip(self.passwords.iter()) {
+            if let Some(token) = hash_trie.get(password_hash) {
+                println!("Login: {}, Password: {}", login, token);
             }
         }
     }
