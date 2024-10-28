@@ -3,6 +3,7 @@ use std::io::{self};
 use csv::ReaderBuilder;
 use crate::modes::ContentManager;
 
+#[derive(Debug)]
 pub struct Passwords {
     pub path: String,
     pub content: String,

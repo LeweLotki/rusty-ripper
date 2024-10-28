@@ -7,15 +7,34 @@ use crate::modes::ContentManager;
 
 use rayon::prelude::*;
 
+#[derive(Debug)]
+pub enum HashFunction {
+    Sha256,
+    Sha512,
+    Md5,
+}
+
+impl HashFunction {
+    pub fn from_str(name: &str) -> Option<HashFunction> {
+        match name.to_lowercase().as_str() {
+            "sha256" => Some(HashFunction::Sha256),
+            "sha512" => Some(HashFunction::Sha512),
+            "md5" => Some(HashFunction::Md5),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Hasher {
     pub dictionary: Dictionary,
     pub hashes: Vec<String>,
     pub tokens: Vec<String>,
-    pub hash_function: String,
+    pub hash_function: HashFunction,
 }
 
 impl Hasher {
-    pub fn new(dictionary: Dictionary, hash_function: String) -> Self {
+    pub fn new(dictionary: Dictionary, hash_function: HashFunction) -> Self {
         Self {
             dictionary,
             hashes: Vec::new(),
@@ -28,19 +47,15 @@ impl Hasher {
         let (tokens, hashes) = {
             let tokens_ref = &self.dictionary.tokens;
 
-            match self.hash_function.as_str() {
-                "sha256" => {
+            match self.hash_function {
+                HashFunction::Sha256 => {
                     self.hash_tokens_in_parallel::<Sha256>(tokens_ref)
                 }
-                "sha512" => {
+                HashFunction::Sha512 => {
                     self.hash_tokens_in_parallel::<Sha512>(tokens_ref)
                 }
-                "md5" => {
+                HashFunction::Md5 => {
                     self.hash_tokens_in_parallel::<Md5>(tokens_ref)
-                }
-                _ => {
-                    println!("Unsupported hash function: {}", self.hash_function);
-                    (Vec::new(), Vec::new())
                 }
             }
         };
@@ -82,22 +97,19 @@ impl ContentManager for Hasher {
     }
 
     fn display(&self) {
-        match self.hash_function.as_str() {
-            "sha256" => {
+        match self.hash_function {
+            HashFunction::Sha256 => {
                 println!("Hash Function: SHA-256");
                 println!("Description: SHA-256 is part of the SHA-2 family and produces a 256-bit hash value.");
             }
-            "sha512" => {
+            HashFunction::Sha512 => {
                 println!("Hash Function: SHA-512");
                 println!("Description: SHA-512 is part of the SHA-2 family and produces a 512-bit hash value.");
             }
-            "md5" => {
+            HashFunction::Md5 => {
                 println!("Hash Function: MD5");
                 println!("Description: MD5 is an older hashing algorithm that produces a 128-bit hash value.");
                 println!("Note: MD5 is considered cryptographically broken and unsuitable for further use.");
-            }
-            _ => {
-                println!("Unsupported hash function: {}", self.hash_function);
             }
         }
     }

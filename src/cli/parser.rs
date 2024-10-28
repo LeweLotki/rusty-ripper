@@ -3,10 +3,11 @@ use clap::CommandFactory;
 
 use crate::modes::ContentManager;
 use crate::modes::dictionary::Dictionary;
-use crate::modes::hasher::Hasher;
+use crate::modes::hasher::{Hasher, HashFunction};
 use crate::modes::passwords::Passwords;
 use crate::modes::retriver::Retriver;
 
+#[derive(Debug)]
 #[derive(Parser)]
 pub struct CLI {
     #[arg(short, long)]
@@ -38,11 +39,16 @@ impl CLI {
 
         if hash_flag && !dictionary_flag && !passwords_flag {
             if let Some(ref hash_function) = args.hash {
-                let dummy_dictionary = Dictionary::new(String::new()); 
-                let mut hasher = Hasher::new(dummy_dictionary, hash_function.clone());
-                hasher.load();
-                hasher.display();
-                return;
+                if let Some(hash_fn_enum) = HashFunction::from_str(hash_function) {
+                    let dummy_dictionary = Dictionary::new(String::new()); 
+                    let mut hasher = Hasher::new(dummy_dictionary, hash_fn_enum);
+                    hasher.load();
+                    hasher.display();
+                    return;
+                } else {
+                    println!("Unsupported hash function: {}", hash_function);
+                    return;
+                }
             }
         }
 
@@ -65,12 +71,17 @@ impl CLI {
                 let mut passwords = Passwords::new(passwords_path.clone());
                 passwords.load();
 
-                let mut hasher = Hasher::new(dictionary, hash_function.clone());
-                hasher.load();
+                if let Some(hash_fn_enum) = HashFunction::from_str(hash_function) {
+                    let mut hasher = Hasher::new(dictionary, hash_fn_enum);
+                    hasher.load();
 
-                let retriver = Retriver::new(hasher, passwords);
-                retriver.run();
-                return;
+                    let retriver = Retriver::new(hasher, passwords);
+                    retriver.run();
+                    return;
+                } else {
+                    println!("Unsupported hash function: {}", hash_function);
+                    return;
+                }
             }
         }
 

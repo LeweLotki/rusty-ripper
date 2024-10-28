@@ -3,6 +3,7 @@ use std::io::{self, Read};
 
 use crate::modes::ContentManager;
 
+#[derive(Debug)]
 pub struct Dictionary {
     pub path: String,
     pub content: String,
