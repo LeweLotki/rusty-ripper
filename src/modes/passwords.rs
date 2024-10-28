@@ -40,12 +40,6 @@ impl Passwords {
     pub fn validate(&self) -> bool {
         !self.logins.is_empty() && self.logins.len() == self.passwords.len()
     }
-
-    pub fn display_tokens(&self) {
-        for (login, password) in self.logins.iter().zip(self.passwords.iter()) {
-            println!("Login: {}, Password: {}", login, password);
-        }
-    }
 }
 
 impl ContentManager for Passwords {

@@ -63,12 +63,6 @@ impl Hasher {
         self.tokens = tokens.into_iter().map(|s| s.to_owned()).collect();
         self.hashes = hashes;
     }
-
-    pub fn display_hashes(&self) {
-        for (token, hash) in self.tokens.iter().zip(self.hashes.iter()) {
-            println!("{} => {}", token, hash);
-        }
-    }
 }
 
 fn hash_tokens_in_parallel<'a, H>(tokens: &'a Vec<String>) -> (Vec<&'a str>, Vec<String>)

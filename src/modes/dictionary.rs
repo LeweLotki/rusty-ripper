@@ -34,13 +34,6 @@ impl Dictionary {
     pub fn parse_tokens(&mut self) {
         self.tokens = self.content.lines().map(|line| line.to_string()).collect();
     }
-
-    pub fn display_tokens(&self) {
-        println!("Tokens in dictionary:");
-        for token in &self.tokens {
-            println!("{}", token);
-        }
-    }
 }
 
 impl ContentManager for Dictionary {
