@@ -49,33 +49,19 @@ impl Hasher {
 
             match self.hash_function {
                 HashFunction::Sha256 => {
-                    self.hash_tokens_in_parallel::<Sha256>(tokens_ref)
+                    hash_tokens_in_parallel::<Sha256>(tokens_ref)
                 }
                 HashFunction::Sha512 => {
-                    self.hash_tokens_in_parallel::<Sha512>(tokens_ref)
+                    hash_tokens_in_parallel::<Sha512>(tokens_ref)
                 }
                 HashFunction::Md5 => {
-                    self.hash_tokens_in_parallel::<Md5>(tokens_ref)
+                    hash_tokens_in_parallel::<Md5>(tokens_ref)
                 }
             }
         };
 
-        self.tokens = tokens;
+        self.tokens = tokens.into_iter().map(|s| s.to_owned()).collect();
         self.hashes = hashes;
-    }
-
-    fn hash_tokens_in_parallel<H>(&self, tokens: &Vec<String>) -> (Vec<String>, Vec<String>)
-    where
-        H: Digest + Send + Sync + 'static,
-    {
-        tokens
-            .par_iter()
-            .map(|token| {
-                let hasher = H::new();
-                let hash = compute_hash(token, hasher);
-                (token.clone(), hash)
-            })
-            .unzip()
     }
 
     pub fn display_hashes(&self) {
@@ -83,6 +69,20 @@ impl Hasher {
             println!("{} => {}", token, hash);
         }
     }
+}
+
+fn hash_tokens_in_parallel<'a, H>(tokens: &'a Vec<String>) -> (Vec<&'a str>, Vec<String>)
+where
+    H: Digest + Send + Sync + 'static,
+{
+    tokens
+        .par_iter()
+        .map(|token| {
+            let hasher = H::new();
+            let hash = compute_hash(token, hasher);
+            (token.as_str(), hash)
+        })
+        .unzip()
 }
 
 fn compute_hash<H: Digest>(token: &str, mut hasher: H) -> String {
