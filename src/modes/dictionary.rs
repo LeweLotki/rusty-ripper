@@ -1,5 +1,6 @@
 use std::fs;
 use std::io::{self, Read};
+use std::path::Path;
 
 use crate::modes::ContentManager;
 
@@ -11,10 +12,10 @@ pub struct Dictionary {
 }
 
 impl Dictionary {
-    pub fn new(path: String) -> Self {
-
-        let mut dictionary: Self = Self {
-            path,
+    pub fn new<P: AsRef<Path>>(path: P) -> Self {
+        let path_str = path.as_ref().to_string_lossy().to_string();
+        let mut dictionary = Self {
+            path: path_str,
             content: String::new(),
             tokens: Vec::new(),
         };
@@ -33,7 +34,8 @@ impl Dictionary {
     }
 
     pub fn load_content(&mut self) -> io::Result<()> {
-        let mut file = fs::File::open(&self.path)?;
+        let path = Path::new(&self.path);
+        let mut file = fs::File::open(path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
         self.content = content;
@@ -58,3 +60,4 @@ impl ContentManager for Dictionary {
         }
     }
 }
+
