@@ -35,12 +35,14 @@ pub struct Hasher {
 
 impl Hasher {
     pub fn new(dictionary: Dictionary, hash_function: HashFunction) -> Self {
-        Self {
+        let mut hasher: Self = Self {
             dictionary,
             hashes: Vec::new(),
             tokens: Vec::new(),
             hash_function,
-        }
+        };
+        hasher.load_hashes();
+        hasher
     }
 
     pub fn load_hashes(&mut self) {
@@ -86,10 +88,6 @@ fn compute_hash<H: Digest>(token: &str, mut hasher: H) -> String {
 }
 
 impl ContentManager for Hasher {
-    fn load(&mut self) {
-        self.load_hashes();
-    }
-
     fn display(&self) {
         match self.hash_function {
             HashFunction::Sha256 => {

@@ -30,8 +30,7 @@ impl CLI {
 
         if dictionary_flag && !hash_flag && !passwords_flag {
             if let Some(ref dictionary_path) = args.dictionary {
-                let mut dictionary = Dictionary::new(dictionary_path.clone());
-                dictionary.load();
+                let dictionary = Dictionary::new(dictionary_path.clone());
                 dictionary.display();
                 return;
             }
@@ -41,8 +40,7 @@ impl CLI {
             if let Some(ref hash_function) = args.hash {
                 if let Some(hash_fn_enum) = HashFunction::from_str(hash_function) {
                     let dummy_dictionary = Dictionary::new(String::new()); 
-                    let mut hasher = Hasher::new(dummy_dictionary, hash_fn_enum);
-                    hasher.load();
+                    let hasher = Hasher::new(dummy_dictionary, hash_fn_enum);
                     hasher.display();
                     return;
                 } else {
@@ -54,8 +52,7 @@ impl CLI {
 
         if passwords_flag && !dictionary_flag && !hash_flag {
             if let Some(ref passwords_path) = args.passwords {
-                let mut passwords = Passwords::new(passwords_path.clone());
-                passwords.load();
+                let passwords = Passwords::new(passwords_path.clone());
                 passwords.display();
                 return;
             }
@@ -65,15 +62,12 @@ impl CLI {
             if let (Some(ref dictionary_path), Some(ref hash_function), Some(ref passwords_path)) =
                 (args.dictionary, args.hash, args.passwords)
             {
-                let mut dictionary = Dictionary::new(dictionary_path.clone());
-                dictionary.load();
+                let dictionary = Dictionary::new(dictionary_path.clone());
 
-                let mut passwords = Passwords::new(passwords_path.clone());
-                passwords.load();
+                let passwords = Passwords::new(passwords_path.clone());
 
                 if let Some(hash_fn_enum) = HashFunction::from_str(hash_function) {
-                    let mut hasher = Hasher::new(dictionary, hash_fn_enum);
-                    hasher.load();
+                    let hasher = Hasher::new(dictionary, hash_fn_enum);
 
                     let retriver = Retriver::new(hasher, passwords);
                     retriver.run();

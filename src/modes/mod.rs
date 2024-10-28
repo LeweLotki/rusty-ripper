@@ -4,6 +4,5 @@ pub mod passwords;
 pub mod retriver;
 
 pub trait ContentManager {
-    fn load(&mut self) -> ();
     fn display(&self) -> ();
 }

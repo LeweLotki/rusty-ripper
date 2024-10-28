@@ -12,11 +12,24 @@ pub struct Dictionary {
 
 impl Dictionary {
     pub fn new(path: String) -> Self {
-         Self {
+
+        let mut dictionary: Self = Self {
             path,
             content: String::new(),
             tokens: Vec::new(),
+        };
+
+        if dictionary.load_content().is_ok() {
+            if dictionary.validate() {
+                dictionary.parse_tokens();  
+            } else {
+                println!("The file is not a valid dictionary.");
+            }
+        } else {
+            println!("Failed to load file: {}", dictionary.path);
         }
+
+        dictionary
     }
 
     pub fn load_content(&mut self) -> io::Result<()> {
@@ -37,18 +50,6 @@ impl Dictionary {
 }
 
 impl ContentManager for Dictionary {
-    fn load(&mut self) -> () {
-        if self.load_content().is_ok() {
-            if self.validate() {
-                self.parse_tokens();  
-            } else {
-                println!("The file is not a valid dictionary.");
-            }
-        } else {
-            println!("Failed to load file: {}", self.path);
-        }
-           
-    }
     fn display(&self) -> () {
         if self.tokens.is_empty() {
             println!("The dictionary could not be loaded due to wrong formatting.");

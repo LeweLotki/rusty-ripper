@@ -13,12 +13,22 @@ pub struct Passwords {
 
 impl Passwords {
     pub fn new(path: String) -> Self {
-        Self {
+        let mut passwords: Self = Self {
             path,
             content: String::new(),
             logins: Vec::new(),
             passwords: Vec::new(),
+        };
+
+        if passwords.load_content().is_ok() {
+            if !passwords.validate() {
+                 println!("Error: The number of logins and passwords do not match.");
+            }
+        } else {
+            println!("Failed to load the file.");
         }
+
+        passwords
     }
 
     pub fn load_content(&mut self) -> io::Result<()> {
@@ -43,16 +53,6 @@ impl Passwords {
 }
 
 impl ContentManager for Passwords {
-    fn load(&mut self) {
-        if self.load_content().is_ok() {
-            if !self.validate() {
-                 println!("Error: The number of logins and passwords do not match.");
-            }
-        } else {
-            println!("Failed to load the file.");
-        }
-    }
-
     fn display(&self) {
         if self.passwords.is_empty() {
             println!("The CSV file could not be loaded due to wrong formatting.");
