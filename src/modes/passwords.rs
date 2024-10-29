@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{self};
+use std::path::Path;
 use csv::ReaderBuilder;
 use crate::modes::ContentManager;
 
@@ -12,9 +13,10 @@ pub struct Passwords {
 }
 
 impl Passwords {
-    pub fn new(path: String) -> Self {
-        let mut passwords: Self = Self {
-            path,
+    pub fn new<P: AsRef<Path>>(path: P) -> Self {
+        let path_str = path.as_ref().to_string_lossy().to_string();
+        let mut passwords = Self {
+            path: path_str,
             content: String::new(),
             logins: Vec::new(),
             passwords: Vec::new(),
@@ -22,7 +24,7 @@ impl Passwords {
 
         if passwords.load_content().is_ok() {
             if !passwords.validate() {
-                 println!("Error: The number of logins and passwords do not match.");
+                println!("Error: The number of logins and passwords do not match.");
             }
         } else {
             println!("Failed to load the file.");
@@ -32,7 +34,8 @@ impl Passwords {
     }
 
     pub fn load_content(&mut self) -> io::Result<()> {
-        let file = File::open(&self.path)?;
+        let path = Path::new(&self.path);
+        let file = File::open(path)?;
         let mut rdr = ReaderBuilder::new()
             .has_headers(true)
             .from_reader(file);
