@@ -69,7 +69,7 @@ impl CLI {
                 if let Some(hash_fn_enum) = HashFunction::from_str(hash_function) {
                     let hasher = Hasher::new(dictionary, hash_fn_enum);
 
-                    let retriver = Retriver::new(hasher, passwords);
+                    let retriver = Retriver::new(&hasher, &passwords);
                     retriver.run();
                     return;
                 } else {

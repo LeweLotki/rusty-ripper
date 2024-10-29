@@ -12,7 +12,7 @@ pub struct Retriver {
 }
 
 impl Retriver {
-    pub fn new(hasher: Hasher, passwords: Passwords) -> Self {
+    pub fn new(hasher: &Hasher, passwords: &Passwords) -> Self {
         Self {
             tokens: hasher.tokens.clone(),
             hashes: hasher.hashes.clone(),
