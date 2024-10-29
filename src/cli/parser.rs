@@ -1,23 +1,26 @@
 use clap::Parser;
 use clap::CommandFactory;
 
+use std::path::PathBuf;
+
 use crate::modes::ContentManager;
 use crate::modes::dictionary::Dictionary;
 use crate::modes::hasher::{Hasher, HashFunction};
 use crate::modes::passwords::Passwords;
 use crate::modes::retriver::Retriver;
 
-#[derive(Debug)]
-#[derive(Parser)]
+
+
+#[derive(Debug, Parser)]
 pub struct CLI {
     #[arg(short, long)]
-    pub dictionary: Option<String>, 
+    pub dictionary: Option<PathBuf>,  
 
     #[arg(long)]
     pub hash: Option<String>,
 
     #[arg(short, long)]
-    pub passwords: Option<String>,
+    pub passwords: Option<PathBuf>,  
 }
 
 impl CLI {
