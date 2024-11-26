@@ -9,14 +9,17 @@ TEST_DIR := ./tests
 # 							{test_number}-output.txt
 # Optional second argument 'sort' will sort both files before comparing
 define compare
-	@if $(if $(2),sort $(TEST_DIR)/$(1)-output.txt | diff $(TEST_DIR)/$(1)-expected.txt -,diff $(TEST_DIR)/$(1)-output.txt $(TEST_DIR)/$(1)-expected.txt); then \
-		echo "✅ Test $(1) PASSED"; \
-	else \
-		echo "❌ Test $(1) FAILED: Differences found: check $(1)-diff.txt $(if $(2),(note: output was firstly sorted.),)"; \
-		$(if $(2),sort $(TEST_DIR)/$(1)-output.txt | diff -u $(TEST_DIR)/$(1)-expected.txt -,diff -u $(TEST_DIR)/$(1)-output.txt $(TEST_DIR)/$(1)-expected.txt) > $(TEST_DIR)/$(1)-diff.txt; \
-	fi
+    @if $(if $(2),\
+        sort $(TEST_DIR)/$(1)-output.txt | diff $(TEST_DIR)/$(1)-expected.txt - &>/dev/null,\
+        diff $(TEST_DIR)/$(1)-output.txt $(TEST_DIR)/$(1)-expected.txt &>/dev/null); then \
+        echo "✅ Test $(1) PASSED"; \
+    else \
+        echo "❌ Test $(1) FAILED: Differences found: check $(1)-diff.txt $(if $(2),(note: output was firstly sorted.),)"; \
+        $(if $(2),\
+            sort $(TEST_DIR)/$(1)-output.txt | diff -u $(TEST_DIR)/$(1)-expected.txt -,\
+            diff -u $(TEST_DIR)/$(1)-output.txt $(TEST_DIR)/$(1)-expected.txt) > $(TEST_DIR)/$(1)-diff.txt; \
+    fi
 endef
-
 
 .PHONY: all
 all: build
