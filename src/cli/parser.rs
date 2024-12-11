@@ -1,7 +1,6 @@
 use clap::CommandFactory;
 use clap::Parser;
 
-use std::io::Write;
 use std::path::PathBuf;
 
 use crate::modes::dictionary::Dictionary;
@@ -21,8 +20,8 @@ pub struct CLI {
     #[arg(short, long)]
     pub passwords: Option<PathBuf>,
 
-    #[arg(short, long)]
-    pub generate: Option<PathBuf>,
+    #[arg(short, long, action = clap::ArgAction::SetTrue)]
+    pub generate: bool,
 
     #[arg(short, long)]
     pub salt: Option<String>,
@@ -35,11 +34,10 @@ impl CLI {
         let dictionary_flag = args.dictionary.is_some();
         let hash_flag = args.hash.is_some();
         let passwords_flag = args.passwords.is_some();
-        let generate_flag = args.generate.is_some();
+        let generate_flag = args.generate;
 
         let dictionary_flag_val = args.dictionary.clone().unwrap_or_default();
         let hash_flag_val = args.hash.clone().unwrap_or_default();
-        let generate_flag_val = args.generate.clone().unwrap_or_default();
         let passwords_flag_val = args.passwords.clone().unwrap_or_default();
         let salt_flag_val = args.salt.clone().unwrap_or_default();
 
@@ -89,12 +87,8 @@ impl CLI {
                 let hasher = Hasher::new(dictionary, hash_fn_enum, salt_flag_val);
                 let hashes = &hasher.hashes;
                 let tokens = &hasher.tokens;
-
-                let mut file = std::fs::File::create(generate_flag_val).unwrap();
-
                 for (hash, token) in hashes.iter().zip(tokens.iter()) {
-                    let line = format!("{},{}\n", hash, token);
-                    file.write_all(line.as_bytes()).unwrap();
+                    println!("{},{}", hash, token);
                 }
 
                 return;

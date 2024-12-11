@@ -38,10 +38,30 @@ test: build
 	$(call compare,003,sort)
 	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash sha512 -p $(TEST_DIR)/passwords/passwords-sha512.csv > $(TEST_DIR)/004-output.txt
 	$(call compare,004,sort)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash md5 --generate > $(TEST_DIR)/005-output.txt
+	$(call compare,005)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash sha256 --generate > $(TEST_DIR)/006-output.txt
+	$(call compare,006)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash sha512 --generate > $(TEST_DIR)/007-output.txt
+	$(call compare,007)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash INCORRECT_HASH > $(TEST_DIR)/008-output.txt
+	$(call compare,008)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/NON-EXISTING-FILE.TXT --hash sha512 --generate > $(TEST_DIR)/009-output.txt
+	$(call compare,009)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash sha256 -p $(TEST_DIR)/passwords/NON-EXISTING-PASSWORD-FILE.csv > $(TEST_DIR)/010-output.txt
+	$(call compare,010)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash md5 --generate --salt saltstring > $(TEST_DIR)/011-output.txt
+	$(call compare,011)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash sha256 --generate --salt saltstring > $(TEST_DIR)/012-output.txt
+	$(call compare,012)
+	$(BINARY_PATH) -d $(TEST_DIR)/dictionaries/dictionary-simple.txt --hash sha512 --generate --salt saltstring > $(TEST_DIR)/013-output.txt
+	$(call compare,013)
+
+	
 
 	
 .PHONY: clean
-clean:
+clean:	
 	# cargo clean
 	rm -f $(TEST_DIR)/[0-9][0-9][0-9]-output.txt
 	rm -f $(TEST_DIR)/[0-9][0-9][0-9]-diff.txt
