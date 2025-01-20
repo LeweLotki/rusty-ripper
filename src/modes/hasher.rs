@@ -1,6 +1,6 @@
-use sha2::{Sha256, Sha512, Digest};
-use md5::Md5;
 use hex;
+use md5::Md5;
+use sha2::{Digest, Sha256, Sha512};
 
 use crate::modes::dictionary::Dictionary;
 use crate::modes::ContentManager;
@@ -31,15 +31,17 @@ pub struct Hasher {
     pub hashes: Vec<String>,
     pub tokens: Vec<String>,
     pub hash_function: HashFunction,
+    pub salt: String,
 }
 
 impl Hasher {
-    pub fn new(dictionary: Dictionary, hash_function: HashFunction) -> Self {
+    pub fn new(dictionary: Dictionary, hash_function: HashFunction, salt: String) -> Self {
         let mut hasher: Self = Self {
             dictionary,
             hashes: Vec::new(),
             tokens: Vec::new(),
             hash_function,
+            salt,
         };
         hasher.load_hashes();
         hasher
@@ -48,17 +50,12 @@ impl Hasher {
     pub fn load_hashes(&mut self) {
         let (tokens, hashes) = {
             let tokens_ref = &self.dictionary.tokens;
+            let salt_ref = &self.salt;
 
             match self.hash_function {
-                HashFunction::Sha256 => {
-                    hash_tokens_in_parallel::<Sha256>(tokens_ref)
-                }
-                HashFunction::Sha512 => {
-                    hash_tokens_in_parallel::<Sha512>(tokens_ref)
-                }
-                HashFunction::Md5 => {
-                    hash_tokens_in_parallel::<Md5>(tokens_ref)
-                }
+                HashFunction::Sha256 => hash_tokens_in_parallel::<Sha256>(tokens_ref, salt_ref),
+                HashFunction::Sha512 => hash_tokens_in_parallel::<Sha512>(tokens_ref, salt_ref),
+                HashFunction::Md5 => hash_tokens_in_parallel::<Md5>(tokens_ref, salt_ref),
             }
         };
 
@@ -67,7 +64,10 @@ impl Hasher {
     }
 }
 
-fn hash_tokens_in_parallel<'a, H>(tokens: &'a Vec<String>) -> (Vec<&'a str>, Vec<String>)
+fn hash_tokens_in_parallel<'a, H>(
+    tokens: &'a Vec<String>,
+    salt: &str,
+) -> (Vec<&'a str>, Vec<String>)
 where
     H: Digest + Send + Sync + 'static,
 {
@@ -75,14 +75,15 @@ where
         .par_iter()
         .map(|token| {
             let hasher = H::new();
-            let hash = compute_hash(token, hasher);
+            let hash = compute_hash(token, hasher, salt);
             (token.as_str(), hash)
         })
         .unzip()
 }
 
-fn compute_hash<H: Digest>(token: &str, mut hasher: H) -> String {
-    hasher.update(token.as_bytes());
+fn compute_hash<H: Digest>(token: &str, mut hasher: H, salt: &str) -> String {
+    let token_salt = format!("{}{}", token, salt);
+    hasher.update(token_salt.as_bytes());
     let result = hasher.finalize();
     hex::encode(result)
 }
@@ -106,4 +107,3 @@ impl ContentManager for Hasher {
         }
     }
 }
-
