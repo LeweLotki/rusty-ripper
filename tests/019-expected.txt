@@ -1,0 +1,11 @@
+Error: Wrong flags combination.
+Usage: rusty-ripper [OPTIONS]
+
+Options:
+  -d, --dictionary <DICTIONARY>  
+      --hash <HASH>              
+  -p, --passwords <PASSWORDS>    
+  -g, --generate                 
+  -s, --salt <SALT>              
+  -h, --help                     Print help
+
