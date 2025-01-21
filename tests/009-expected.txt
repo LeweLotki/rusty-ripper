@@ -1,1 +1,1 @@
-Failed to load file: ./tests/dictionaries/NON-EXISTING-FILE.TXT
+No dictionary path provided or access error: ./tests/dictionaries/NON-EXISTING-FILE.TXT

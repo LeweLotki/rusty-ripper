@@ -25,6 +25,9 @@ pub struct CLI {
 
     #[arg(short, long)]
     pub salt: Option<String>,
+
+    #[arg(long, action = clap::ArgAction::SetTrue)]
+    pub benchmark: bool,
 }
 
 impl CLI {
@@ -35,6 +38,7 @@ impl CLI {
         let hash_flag = args.hash.is_some();
         let passwords_flag = args.passwords.is_some();
         let generate_flag = args.generate;
+        let benchmark_flag = args.benchmark;
 
         let dictionary_flag_val = args.dictionary.clone().unwrap_or_default();
         let hash_flag_val = args.hash.clone().unwrap_or_default();
@@ -51,7 +55,11 @@ impl CLI {
             if let Some(hash_fn_enum) = HashFunction::from_str(hash_flag_val.as_str()) {
                 let dummy_dictionary = Dictionary::new(String::new());
                 let hasher = Hasher::new(dummy_dictionary, hash_fn_enum, salt_flag_val);
-                hasher.display();
+                if benchmark_flag {
+                    hasher.run_benchmark();
+                } else {
+                    hasher.display();
+                }
                 return;
             } else {
                 println!("Unsupported hash function: {}", hash_flag_val);

@@ -22,12 +22,15 @@ impl Dictionary {
 
         if dictionary.load_content().is_ok() {
             if dictionary.validate() {
-                dictionary.parse_tokens();  
+                dictionary.parse_tokens();
             } else {
                 println!("The file is not a valid dictionary.");
             }
         } else {
-            println!("Failed to load file: {}", dictionary.path);
+            println!(
+                "No dictionary path provided or access error: {}",
+                dictionary.path
+            );
         }
 
         dictionary
@@ -43,7 +46,9 @@ impl Dictionary {
     }
 
     pub fn validate(&self) -> bool {
-        self.content.lines().all(|line| line.split_whitespace().count() == 1)
+        self.content
+            .lines()
+            .all(|line| line.split_whitespace().count() == 1)
     }
 
     pub fn parse_tokens(&mut self) {
@@ -56,8 +61,10 @@ impl ContentManager for Dictionary {
         if self.tokens.is_empty() {
             println!("The dictionary could not be loaded due to wrong formatting.");
         } else {
-            println!("Dictionary loaded successfully with {} tokens.", self.tokens.len());
+            println!(
+                "Dictionary loaded successfully with {} tokens.",
+                self.tokens.len()
+            );
         }
     }
 }
-
