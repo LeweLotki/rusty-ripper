@@ -7,5 +7,6 @@ Options:
   -p, --passwords <PASSWORDS>    
   -g, --generate                 
   -s, --salt <SALT>              
+      --benchmark                
   -h, --help                     Print help
 

@@ -35,6 +35,8 @@ pub struct Hasher {
 }
 
 impl Hasher {
+    const BENCHMARK_ITERATIONS: u64 = 1_000_000;
+
     pub fn new(dictionary: Dictionary, hash_function: HashFunction, salt: String) -> Self {
         let mut hasher: Self = Self {
             dictionary,
@@ -45,6 +47,35 @@ impl Hasher {
         };
         hasher.load_hashes();
         hasher
+    }
+
+    pub fn run_benchmark(&self) {
+        use std::time::Instant;
+
+        println!(
+            "Running parallel benchmark with {} iterations...",
+            Self::BENCHMARK_ITERATIONS
+        );
+        let test_value = "password123".to_string();
+        let tokens: Vec<String> = (0..Self::BENCHMARK_ITERATIONS)
+            .map(|_| test_value.clone())
+            .collect();
+
+        let start = Instant::now();
+
+        let (_, _) = match self.hash_function {
+            HashFunction::Sha256 => hash_tokens_in_parallel::<Sha256>(&tokens, &self.salt),
+            HashFunction::Sha512 => hash_tokens_in_parallel::<Sha512>(&tokens, &self.salt),
+            HashFunction::Md5 => hash_tokens_in_parallel::<Md5>(&tokens, &self.salt),
+        };
+
+        let duration = start.elapsed();
+        let hashes_per_second = (Self::BENCHMARK_ITERATIONS as f64) / duration.as_secs_f64();
+
+        println!("Parallel benchmark results for {:?}:", self.hash_function);
+        println!("Time elapsed: {:.2?}", duration);
+        let mega_hashes_per_second = hashes_per_second / 1_000_000.0;
+        println!("{:.2} MH/s", mega_hashes_per_second);
     }
 
     pub fn load_hashes(&mut self) {
